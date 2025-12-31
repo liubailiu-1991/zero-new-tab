@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merged Search Workbench - Max 1440px Scale</title>
+
+<style>
+    :root {
+        --bg-body: #e0e0e0; 
+        --stripe-color: #fff; 
+        --bg: var(--stripe-color);
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-body); 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        overflow: hidden; 
+    }
+
+    /* =========================================================
+       外层包裹容器
+       负责：占满屏幕 + 居中显示
+       ========================================================= */
+    #embed-wrapper {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;  /* 垂直居中 */
+        justify-content: center; /* 水平居中 */
+        overflow: hidden;
+    }
+
+    /* =========================================================
+       主舞台 1440x900
+       ========================================================= */
+    .stage-container {
+        position: relative;
+        width: 1440px; 
+        height: 900px;
+        background-color: #ffffff;
+        box-shadow: 0 0 30px rgba(0,0,0,0.1); /* 阴影 */
+        overflow: hidden; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 119px; 
+        box-sizing: border-box;
+        
+        /* 关键：防止 Flex 布局压缩它，缩放中心设为正中间 */
+        flex-shrink: 0;
+        transform-origin: center center;
+    }
+
+    /* --- 以下为原有样式，保持不变 --- */
+    .top-aurora-wrapper {
+        position: absolute; top: 0; left: 0; width: 100%; height: 600px; 
+        z-index: 5; pointer-events: none; 
+        animation: fadeOutContainer 3s ease-out 2s forwards;
+        will-change: opacity, transform;
+    }
+    .hero-aurora {
+        width: 100%; height: 100%; position: relative; display: flex;
+        --stripes: repeating-linear-gradient(100deg, var(--stripe-color) 0%, var(--stripe-color) 7%, transparent 10%, transparent 12%, var(--stripe-color) 16%);
+        --rainbow: repeating-linear-gradient(100deg, #60a5fa 10%, #e879f9 15%, #60a5fa 20%, #5eead4 25%, #60a5fa 30%);
+        background-image: var(--stripes), var(--rainbow);
+        background-size: 300%, 200%; background-position: 50% 50%, 50% 50%;
+        animation: introAurora 1.5s ease-out forwards;
+        mask-image: radial-gradient(ellipse at 50% 0%, black 20%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 20%, transparent 70%);
+    }
+    @keyframes introAurora {
+        0% { filter: blur(20px) invert(100%) opacity(0) saturate(70%); transform: scale(1.05); }
+        100% { filter: blur(10px) invert(100%) opacity(0.4) saturate(70%); transform: scale(1); }
+    }
+    .hero-aurora::after {
+        content: ""; position: absolute; inset: 0;
+        background-image: var(--stripes), var(--rainbow);
+        background-size: 200%, 100%;
+        animation: smoothBg 60s linear infinite;
+        background-attachment: scroll; mix-blend-mode: difference;
+    }
+    @keyframes smoothBg { from { background-position: 50% 50%, 50% 50%; } to { background-position: 350% 50%, 350% 50%; } }
+    @keyframes fadeOutContainer {
+        0% { opacity: 1; transform: translateY(0) scale(1); }
+        100% { opacity: 0; transform: translateY(-30px) scale(1.05); visibility: hidden; }
+    }
+    .browser-header { position: absolute; top: 0; left: 0; width: 1440px; height: 119px; z-index: 100; pointer-events: none; object-fit: cover; }
+    
+    .aurora-layer { position: absolute; bottom: 0; left: 0; width: 100%; height: 5%; z-index: 0; filter: blur(20px); mix-blend-mode: multiply; pointer-events: none; opacity: 0; transition: opacity 2.5s ease; }
+    .blob { position: absolute; border-radius: 50%; mix-blend-mode: multiply; opacity: 0.7; will-change: transform; bottom: -460%; }
+    .b-yellow { background: #FFD761; width: 50%; height: 400%; left: -5%; animation: breathe 2s infinite ease-in-out alternate; }
+    .b-red { background: #FF9593; width: 50%; height: 400%; left: 15%; animation: breathe 4s infinite ease-in-out alternate-reverse; }
+    .b-orange { background: #82B6FF; width: 50%; height: 400%; left: 30%; opacity: 0.5; animation: breathe 3s infinite ease-in-out alternate-reverse; }
+    .b-purple { background: #EE8BFF; width: 50%; height: 400%; left: 45%; animation: breathe 3s infinite ease-in-out alternate; }
+    .b-blue { background: #82B6FF; width: 50%; height: 400%; left: 65%; animation: breathe 4s infinite ease-in-out alternate-reverse; }
+    @keyframes breathe { 0% { transform: translateY(0) scaleY(1) scaleX(1); } 100% { transform: translateY(-10%) scaleY(1.2) scaleX(1.05); } }
+
+    .main-layout { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
+    .logo-img { width: 500px; height: 200px; object-fit: contain; margin-bottom: 0px; display: block; }
+    .site-img { width: 748px; height: 106px; object-fit: contain; margin-top: 24px; display: block; }
+    .top-right-nav { position: absolute; top: 119px; right: 0; width: 228px; height: 48px; z-index: 20; }
+    .left-nav { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 64px; height: 144px; z-index: 20; }
+
+    .workbench-entry { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 20; display: inline-flex; padding: 5px 12px; align-items: center; gap: 4px; background-color: #ffffff; border-radius: 99px; border: 1px solid rgba(0, 0, 0, 0.10); box-sizing: border-box; cursor: pointer; transition: all 0.3s ease; }
+    .workbench-entry:hover { background-color: #fafafa; border-color: rgba(0, 0, 0, 0.20); }
+    @keyframes scroll-move { 0% { transform: translateY(0); } 50% { transform: translateY(2px); } 100% { transform: translateY(0); } }
+    .mouse-wheel-anim { animation: scroll-move 1.2s ease-in-out infinite; transform-origin: center; }
+    .entry-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(0, 0, 0, 0.90); font-family: "Microsoft YaHei UI", sans-serif; font-size: 13px; font-weight: 400; line-height: 22px; margin: 0 2px; }
+    
+    .avatar-carousel { position: relative; width: 42px; height: 16px; flex-shrink: 0; margin-left: 4px; }
+    .avatar-item { position: absolute; width: 16px; height: 16px; border: none; border-radius: 50%; object-fit: cover; transition: all 0.5s ease-in-out; opacity: 0; transform: translateX(36px); z-index: 0; }
+    .state-exit { transform: translateX(-12px); opacity: 0; z-index: 0; } 
+    .state-1 { transform: translateX(0px); opacity: 1; z-index: 10; }
+    .state-2 { transform: translateX(12px); opacity: 1; z-index: 9; } 
+    .state-3 { transform: translateX(24px); opacity: 1; z-index: 8; } 
+    .state-wait { transform: translateX(36px); opacity: 0; z-index: 7; } 
+    .arrow-icon-anim { animation: bounce-vertical 1.5s infinite ease-in-out; }
+    @keyframes bounce-vertical { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+
+    .search-wrapper { position: relative; width: 680px; height: 48px; border-radius: 100px; z-index: 10; flex-shrink: 0; }
+    .search-box { position: relative; width: 100%; box-sizing: border-box; display: flex; height: 48px; padding: 8px 12px 8px 16px; justify-content: space-between; align-items: center; align-self: stretch; border-radius: 100px; background: #FFF; box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.25); }
+    .search-icon { width: 24px; height: 24px; color: #9ca3af; margin-right: 8px; flex-shrink: 0; }
+    input { flex: 1; border: none; outline: none; background: transparent; font-size: 16px; color: #1f2937; height: 100%; min-width: 0; }
+    input::placeholder { color: #9ca3af; }
+</style>
+</head>
+
+<body>
+
+    <div id="embed-wrapper">
+        <div class="stage-container" id="target-stage">
+            
+            <img class="browser-header" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOBQFpSmdVghuK7f51UBzrl8VG9oQGPwAC7SIAAig5UFaHgk4QpP5x2jYE.png" alt="Browser Header">
+
+            <div class="top-aurora-wrapper">
+                <div class="hero-aurora"></div>
+            </div>
+
+            <div class="aurora-layer">
+                <div class="blob b-yellow"></div>
+                <div class="blob b-red"></div>
+                <div class="blob b-orange"></div>
+                <div class="blob b-purple"></div>
+                <div class="blob b-blue"></div>
+            </div>
+
+            <img class="top-right-nav" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOAfxpSkcqFklGIlIU6lR49fZ-0ppMnAACkR8AAig5UFaFEXZjzGPKEzYE.png" alt="AI Settings">
+
+            <img class="left-nav" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOAf1pSkcyn-PybzF_5BMRET60JdEXtQACkh8AAig5UFbBK6_21xiZMjYE.png" alt="Navigation">
+            
+            <div class="workbench-entry">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M7.5 1C10.5376 1 13 3.46243 13 6.5V10.5L12.9932 10.7832C12.8458 13.6892 10.4426 16 7.5 16C4.55741 16 2.15422 13.6892 2.00684 10.7832L2 10.5V6.5C2 3.46243 4.46243 1 7.5 1ZM7.5 2C5.01472 2 3 4.01472 3 6.5V10.5C3 12.9853 5.01472 15 7.5 15C9.98528 15 12 12.9853 12 10.5V6.5C12 4.01472 9.98528 2 7.5 2Z" fill="black" fill-opacity="0.9"/>
+                    <path class="mouse-wheel-anim" d="M7.5 4C7.77614 4 8 4.22386 8 4.5V6.5C8 6.77614 7.77614 7 7.5 7C7.22386 7 7 6.77614 7 6.5V4.5C7 4.22386 7.22386 4 7.5 4Z" fill="black" fill-opacity="0.9"/>
+                </svg>
+                <span class="entry-text">滑动进入工作台</span>
+                <div class="avatar-carousel">
+                    <img class="avatar-item" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOGT9pS7XcfJSDz-UtxmrnwnncMbtpOAACISEAAqnnYVbE2OpsDwVShDYE.png" alt="01">
+                    <img class="avatar-item" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOGURpS7XhILohZ41ChBFRiZkCqe75bQACJiEAAqnnYVZfhDty6E54sjYE.png" alt="02">
+                    <img class="avatar-item" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOGUNpS7XheYvW4kMeNLZefuftuEmxigACJSEAAqnnYVZIUUF70gXJkjYE.png" alt="03">
+                    <img class="avatar-item" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOGUFpS7XcbOmhAAGGoclXE4TakhVAnjUAAiMhAAKp52FWjwFiMti_DfQ2BA.png" alt="04">
+                    <img class="avatar-item" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOGUJpS7Xc3fBlFeAmibPm2AeDPEk8hAACJCEAAqnnYVbcWeAuIQP6kjYE.png" alt="05">
+                    <img class="avatar-item" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOGUBpS7Xc1aORujdJF5qW-TfXeeHuqAACIiEAAqnnYVYZ5OUVFmoY4jYE.png" alt="06">
+                </div>
+                <svg class="arrow-icon-anim" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M11.7002 8.09961C11.9211 7.93422 12.2348 7.97944 12.4004 8.2002C12.5658 8.42109 12.5206 8.73478 12.2998 8.90039L8.2998 11.9004C8.12216 12.0334 7.87784 12.0334 7.7002 11.9004L3.7002 8.90039C3.47944 8.73477 3.43422 8.42107 3.59961 8.2002C3.7652 7.97942 4.07891 7.93426 4.2998 8.09961L8 10.874L11.7002 8.09961ZM11.7002 4.59961C11.9211 4.43422 12.2348 4.47944 12.4004 4.7002C12.5658 4.92109 12.5206 5.23478 12.2998 5.40039L8.2998 8.40039C8.12216 8.5334 7.87784 8.53341 7.7002 8.40039L3.7002 5.40039C3.47944 5.23477 3.43422 4.92107 3.59961 4.7002C3.7652 4.47942 4.07891 4.43426 4.2998 4.59961L8 7.37402L11.7002 4.59961Z" fill="black" fill-opacity="0.9"/>
+                </svg>
+            </div>
+
+            <div class="main-layout">
+                <img class="logo-img" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOAgABaUpHRlB_Jz_kZItrw2IOBbXiPzMAApYfAAIoOVBWNjax8cX1k5Q2BA.png" alt="Logo">
+                <div class="search-wrapper">
+                    <div class="search-box">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" placeholder="搜索任何问题...">
+                    </div>
+                </div>
+                <img class="site-img" src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEOAf9pSkc_O27S4jZYOqh-b0ZHME9YegAClR8AAig5UFYbpKPW9QxlpjYE.png" alt="Website Preview">
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    // =========================================================
+    // ✅ 缩放逻辑：小屏幕缩小，大屏幕保持原大
+    // =========================================================
+    function autoScale() {
+        const wrapper = document.getElementById('embed-wrapper');
+        const stage = document.getElementById('target-stage');
+        
+        const designWidth = 1440;
+        const designHeight = 900;
+        
+        const availWidth = wrapper.clientWidth;
+        const availHeight = wrapper.clientHeight;
+        
+        // 1. 计算理论缩放比 (保持内容完整)
+        let scale = Math.min(availWidth / designWidth, availHeight / designHeight);
+        
+        // 2. 核心修改：设定上限为 1
+        // 如果屏幕很大，scale 算出是 1.2，这里会强制变为 1
+        // 此时，Flexbox 会自动处理居中
+        if (scale > 1) {
+            scale = 1;
+        }
+
+        stage.style.transform = `scale(${scale})`;
+    }
+
+    // 初始化与监听
+    window.addEventListener('load', autoScale);
+    window.addEventListener('resize', autoScale);
+
+    if (window.ResizeObserver) {
+        new ResizeObserver(autoScale).observe(document.getElementById('embed-wrapper'));
+    }
+
+    // =========================================================
+    // ✅ 其他交互逻辑
+    // =========================================================
+    setTimeout(() => {
+        const layer = document.querySelector('.aurora-layer');
+        if(layer) layer.style.opacity = '1';
+    }, 2500);
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const items = document.querySelectorAll('.avatar-item');
+        if(items.length === 0) return;
+        const totalItems = items.length;
+        let step = 0;
+        
+        const updatePositions = () => {
+            items.forEach((item, index) => {
+                let offset = (index - step) % totalItems;
+                if (offset < 0) offset += totalItems;
+                item.className = 'avatar-item';
+                if (offset === 0) item.classList.add('state-1');
+                else if (offset === 1) item.classList.add('state-2');
+                else if (offset === 2) item.classList.add('state-3');
+                else if (offset === totalItems - 1) item.classList.add('state-exit');
+                else item.classList.add('state-wait');
+            });
+        };
+
+        updatePositions();
+        setInterval(() => { step = (step + 1) % totalItems; updatePositions(); }, 2000);
+    });
+</script>
+
+</body>
+</html>
