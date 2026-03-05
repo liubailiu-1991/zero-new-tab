@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>页面 + AI助手 组合</title>
+  <style>
+    /* 修复：优化居中逻辑，防止小屏幕下顶部被截断无法滚动 */
+    html, body { 
+      margin: 0; 
+      padding: 0; 
+      background: #ffffff; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+    
+    body {
+      padding: 40px 0; /* 为小屏幕滚动预留上下安全呼吸空间 */
+    }
+    
+    .stage{
+      width: 1440px;
+      height: 900px; /* 41 + 859 = 900 */
+      margin: auto;  /* 结合 body 的 flex，实现安全的全方位居中 */
+      overflow: hidden;
+      background: #fff;
+      
+      /* 修复：保证加上边框后，总尺寸依然严格是 1440x900，不被撑大 */
+      box-sizing: border-box;
+      
+      /* 边框线与浮动阴影 */
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
+    }
+    
+    .header{
+      width: 1440px;
+      height: 41px;
+      display: block;
+    }
+    .main{
+      width: 1440px;
+      height: 859px;
+      display: flex;
+      flex-direction: row;
+      gap: 0;
+    }
+    .web{
+      width: 990px;
+      height: 859px;
+      display: block;
+      flex: 0 0 990px;
+      object-fit: cover;
+    }
+    .ai{
+      width: 450px;
+      height: 859px;
+      flex: 0 0 450px;
+      border: 0;
+      display: block;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stage">
+    <img
+      class="header"
+      src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAERcz5pqWtXmXUYC5ORlpY8KXZQ8RIIjgAC3iMAArXISFUufAABbUG1ZDo6BA.png"
+      alt="浏览器头部"
+      width="1440"
+      height="41"
+      draggable="false"
+    />
+
+    <div class="main">
+      <img
+        class="web"
+        src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAERcz9pqWtjVS8TAduqPdSV-sBmJ0eaoQAC3yMAArXISFVLKaAy5VZzUjoE.png"
+        alt="网页部分"
+        width="990"
+        height="859"
+        draggable="false"
+      />
+
+      <iframe
+        class="ai"
+        title="AI助手"
+        scrolling="no"
+        frameborder="0"
+        referrerpolicy="no-referrer"
+        srcdoc='<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI助手</title>
+
+<style>
+/* ========================= */
+/* 原页面样式（保留） */
+/* ========================= */
+body{
+  margin:0;
+  background:#f2f3f5;
+  display:flex;
+  justify-content:center;
+}
+
+.container{
+  width:450px;
+  height:859px;
+  position:relative;
+  background:url("https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAERciZpqUqJbbRBSoBBh0dJv4bwDFBiYQACNyIAArXISFXTm1HA2F_hXDoE.png") no-repeat center/cover;
+}
+
+.ai-block{
+  position:absolute;
+  top:160px;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.logo-wrap{
+  margin-bottom:16px; /* logo 与打字间距 16px */
+}
+
+/* ===================================================== */
+/* AI助手logo-72px🚩.html 的 LOGO CSS（完整原样保留） */
+/* ===================================================== */
+
+.logo-frame {
+  width: 72px;
+  height: 72px;
+  position: relative;
+  overflow: visible; 
+}
+
+.logo-scale {
+  width: 220px;
+  height: 220px;
+  transform-origin: top left;
+  transform: scale(calc(72 / 220)); 
+}
+
+.head-base {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background-color: #5500ff;
+  overflow: hidden;
+
+  transform: translateZ(0);
+
+  -webkit-mask-image: radial-gradient(circle, #000 99.2%, transparent 100%);
+          mask-image: radial-gradient(circle, #000 99.2%, transparent 100%);
+
+  animation: gentle-float 6s ease-in-out infinite;
+  box-shadow:
+    inset 0 0 0 1px rgba(85, 0, 255, 1),
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 32px 55px -15px rgba(85, 0, 255, 0.45);
+
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.5s ease;
+  cursor: pointer;
+
+  --track-x: 0;
+  --track-y: 0;
+  --track-scale-x: 1;
+  --track-scale-y: 1;
+}
+
+.head-base:hover {
+  transform: translateY(-8px) scale(1.02) translateZ(0);
+  box-shadow:
+    inset 0 0 0 1px rgba(85, 0, 255, 1),
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 45px 65px -15px rgba(85, 0, 255, 0.6);
+  animation-play-state: paused;
+}
+
+.fluid-container {
+  position: absolute;
+  inset: 0;
+  animation: texture-roll 10s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.head-base:hover .fluid-container {
+  animation: none;
+  transform: translate(calc(var(--track-x) * 18px), calc(var(--track-y) * 12px)) scale(1.02);
+  transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.fluid {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  transition: all 0.5s ease;
+}
+
+.fluid-pink { width: 195px; height: 195px; background: #e82ae0; top: -35px; right: -25px; animation: flow-move 6s infinite alternate ease-in-out; }
+.fluid-blue-deep { width: 180px; height: 180px; background: #1a4dff; bottom: -35px; left: -15px; animation: flow-move 9s infinite alternate ease-in-out; }
+.fluid-cyan { width: 160px; height: 160px; background: #16b3ff; bottom: -20px; left: -25px; animation: flow-move 8s infinite alternate-reverse ease-in-out; }
+.fluid-purple-glow { width: 180px; height: 180px; background: #a62eff; top: 20px; left: 20px; animation: flow-move-center 7s infinite alternate ease-in-out; }
+
+.lighting-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  background: radial-gradient(
+    circle at 35% 25%,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 35%,
+    rgba(20, 0, 80, 0.35) 85%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  box-shadow:
+    inset 0 30px 40px -10px rgba(255, 240, 250, 0.95),
+    inset 0 -30px 45px -8px rgba(30, 170, 255, 0.95),
+    inset -25px -10px 45px -10px rgba(255, 42, 180, 0.8),
+    inset 20px 10px 45px -10px rgba(184, 77, 255, 0.8),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.eyes-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 36px;
+  z-index: 15;
+  animation: spherical-roll 10s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.head-base:hover .eyes-container {
+  animation: none;
+  transform: translate(calc(var(--track-x) * 35px), calc(var(--track-y) * 25px))
+             scaleX(var(--track-scale-x)) scaleY(var(--track-scale-y));
+  transition: transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.eye {
+  width: 22px;
+  height: 64px;
+  background: #ffffff;
+  border-radius: 11px;
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 18px rgba(255, 255, 255, 0.4);
+  animation: smart-blink 6s infinite;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.head-base:hover .eye {
+  animation: none;
+  width: 28px;
+  height: 45px;
+  border-radius: 14px;
+  box-shadow:
+    0 0 15px rgba(255, 255, 255, 1),
+    0 0 25px rgba(255, 255, 255, 0.6);
+}
+
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes flow-move {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(15px, 20px) scale(1.1); }
+}
+@keyframes flow-move-center {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-10px, 15px) scale(1.15); }
+}
+@keyframes spherical-roll {
+  0%, 15% { transform: translate(0, 0) scale(1); }
+  20%, 30% { transform: translate(-35px, -15px) scaleX(0.85) scaleY(0.95); }
+  35%, 45% { transform: translate(30px, 15px) scaleX(0.88) scaleY(0.95); }
+  50% { transform: translate(0, 0) scale(1); }
+  53% { transform: translate(0, 35px) scaleY(0.75); }
+  58%, 70% { transform: translate(0, 0) scale(1); }
+  75%, 85% { transform: translate(15px, -5px) rotateZ(12deg) scaleX(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+@keyframes texture-roll {
+  0%, 15% { transform: translate(0, 0); }
+  20%, 30% { transform: translate(-18px, -8px); }
+  35%, 45% { transform: translate(15px, 8px); }
+  50% { transform: translate(0, 0); }
+  53% { transform: translate(0, 18px); }
+  58%, 70% { transform: translate(0, 0); }
+  75%, 85% { transform: translate(8px, -2px) rotateZ(6deg); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes smart-blink {
+  0%, 45%, 53%, 100% { transform: scaleY(1); }
+  48% { transform: scaleY(0.05); }
+  50% { transform: scaleY(1); }
+  51% { transform: scaleY(0.05); }
+}
+
+@keyframes intro-blink {
+  0%   { transform: scaleY(1); }
+  35%  { transform: scaleY(1); }
+  58%  { transform: scaleY(0.08); }
+  68%  { transform: scaleY(0.08); }
+  100% { transform: scaleY(1); }
+}
+
+/* ========================= */
+/* AI助手-打字-02 CSS */
+/* ========================= */
+  .typing-wrapper {
+    font-size: 24px;
+    font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+    font-weight: normal; 
+    color: #000000;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    text-align: center;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 28px;
+    background: #000;
+    margin-left: 6px;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+  }
+
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="ai-block">
+
+      <div class="logo-wrap">
+        <div class="logo-frame">
+          <div class="logo-scale">
+            <div class="head-base" id="ai-logo">
+              <div class="fluid-container">
+                <div class="fluid fluid-blue-deep"></div>
+                <div class="fluid fluid-cyan"></div>
+                <div class="fluid fluid-purple-glow"></div>
+                <div class="fluid fluid-pink"></div>
+              </div>
+
+              <div class="lighting-overlay"></div>
+
+              <div class="eyes-container">
+                <div class="eye"></div>
+                <div class="eye"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-wrapper">
+        <span id="text"></span>
+        <span class="cursor"></span>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+/* ===================================================== */
+/* AI助手logo-72px🚩.html 的 LOGO JS（完整原样保留，单引号转双引号） */
+/* ===================================================== */
+const logo = document.getElementById("ai-logo");
+
+logo.addEventListener("mousemove", (e) => {
+  const rect = logo.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+
+  const dist = Math.sqrt(x * x + y * y);
+  const clampedDist = Math.min(1, dist);
+
+  const scaleX = 1 - (clampedDist * 0.15);
+  const scaleY = 1 - (clampedDist * 0.10);
+
+  logo.style.setProperty("--track-x", x);
+  logo.style.setProperty("--track-y", y);
+  logo.style.setProperty("--track-scale-x", scaleX);
+  logo.style.setProperty("--track-scale-y", scaleY);
+});
+
+logo.addEventListener("mouseleave", () => {
+  logo.style.setProperty("--track-x", 0);
+  logo.style.setProperty("--track-y", 0);
+  logo.style.setProperty("--track-scale-x", 1);
+  logo.style.setProperty("--track-scale-y", 1);
+});
+
+window.addEventListener("load", () => {
+  const eyes = document.querySelectorAll(".eye");
+
+  const startDelay = 260;
+  const blinkDur = 1150;
+
+  setTimeout(() => {
+    eyes.forEach((eye) => {
+      eye.style.animation = `intro-blink ${blinkDur}ms ease-in-out 1`;
+    });
+
+    setTimeout(() => {
+      eyes.forEach((eye) => {
+        eye.style.animation = "smart-blink 6s infinite";
+      });
+    }, blinkDur + 20);
+  }, startDelay);
+});
+
+/* =========================== */
+/* AI助手-打字-02 原始JS逻辑 */
+/* =========================== */
+  const content = "有什么我能帮你的吗？";
+  const textEl = document.getElementById("text");
+
+  const typingSpeed = 150;
+  const totalCycle = 5000; // 5秒循环
+
+  function startTyping() {
+
+    let index = 0;
+
+    const startTime = Date.now();
+
+    function type() {
+
+      if (index <= content.length) {
+        textEl.innerHTML = content.substring(0, index);
+        index++;
+        setTimeout(type, typingSpeed);
+      } else {
+
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(totalCycle - elapsed, 0);
+
+        setTimeout(() => {
+          textEl.innerHTML = "";
+          startTyping();
+        }, remaining);
+
+      }
+
+    }
+
+    type();
+
+  }
+
+  startTyping();
+
+</script>
+</body>
+</html>'
+      ></iframe>
+    </div>
+  </div>
+</body>
+</html>
